@@ -18,25 +18,19 @@ select @customerNumber := customerNumber from orders where orderNumber = @recent
 1 row in set (0.00 sec)
 */
 
-select temp.customerName,
+select customers.customerName,
        @recentOrderNumber as orderNumber,
-       temp.shippedDate,
-       temp.paymentDate,
-       temp.amount,
+       orders.shippedDate,
+       payments.paymentDate,
+       payments.amount,
        orderdetails.quantityOrdered,
        products.productName,
        productlines.image
-from (
-        select customers.customerName,
-               orders.shippedDate,
-               payments.paymentDate,
-               payments.amount
-        from customers, orders, payments
-        where customers.customerNumber = @customerNumber
-            and orders.orderNumber = @recentOrderNumber
-            and payments.customerNumber = @customerNumber
-    ) as temp, orderdetails, products, productlines
-where orderdetails.orderNumber = @recentOrderNumber
+from customers, orders, payments, orderdetails, products, productlines
+where customers.customerNumber = @customerNumber
+    and orders.orderNumber = @recentOrderNumber
+    and payments.customerNumber = @customerNumber
+    and orderdetails.orderNumber = @recentOrderNumber
     and products.productCode = orderdetails.productCode
     and productlines.productLine = products.productLine;
 
